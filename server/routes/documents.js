@@ -2,6 +2,7 @@ const express = require('express');
 const fs = require('fs');
 const path = require('path');
 const router = express.Router();
+const marked = require('marked');
 
 const DATA_FILE = path.join(__dirname, '../data.json');
 
@@ -33,6 +34,15 @@ router.get('/:id', (req, res) => {
   const doc = docs.find(d => d.id === Number(req.params.id));
   if (!doc) return res.status(404).json({ error: 'Not found' });
   res.json(doc);
+});
+
+// 문서 HTML 변환 API
+router.get('/:id/html', (req, res) => {
+  const docs = readDocuments();
+  const doc = docs.find(d => d.id === Number(req.params.id));
+  if (!doc) return res.status(404).json({ error: 'Not found' });
+  const html = marked.parse(doc.content || '');
+  res.send(html);
 });
 
 // 문서 생성
